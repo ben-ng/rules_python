@@ -95,8 +95,11 @@ def main():
   args = parser.parse_args()
 
   # https://github.com/pypa/pip/blob/9.0.1/pip/__init__.py#L209
-  if pip_main(["wheel", "-w", args.directory, "-r", args.input]):
-    sys.exit(1)
+  # We need to do this line-by-line because pip -r doesn't respect order
+  with open(args.input, 'r') as f:
+    for requirement in f:
+      if pip_main(["wheel", "-w", args.directory, requirement]):
+        sys.exit(1)
 
   # Enumerate the .whl files we downloaded.
   def list_whls():
